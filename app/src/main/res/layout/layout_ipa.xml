@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:text=" IPA - "
+        android:textAlignment="center"
+
+        android:id="@+id/textView"
+        android:layout_weight="1" />
+
+    <EditText
+        android:layout_width="0dp"
+
+        android:layout_height="wrap_content"
+        android:inputType="number|phone"
+        android:ems="10"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:id="@+id/editText"
+        android:imeOptions="actionGo"
+        android:layout_weight="2" />
+</LinearLayout>

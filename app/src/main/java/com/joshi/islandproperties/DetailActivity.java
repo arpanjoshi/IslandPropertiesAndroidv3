@@ -57,7 +57,7 @@ public class DetailActivity extends AppCompatActivity {
 //                        .show();
         dropbox = MainActivity.dropbox;
 
-        strDir = "/" + folderName;
+        strDir = folderName;
         ImageView iv = (ImageView)findViewById(R.id.imageView_large_detail);
 //        iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
 

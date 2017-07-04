@@ -18,5 +18,5 @@
     <string name="hint_state">State</string>
     <string name="hint_zipcode">ZIP code</string>
     <string name="title_activity_login">LoginActivity</string>
-
+    <string name="app_key">6hmmdoun2b3wd5s</string>
 </resources>

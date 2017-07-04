@@ -80,19 +80,6 @@ public class UploadPicturesActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//        getPhotoDialog = new ProgressDialog(this);
-//        getPhotoDialog.setMessage("Getting Photos");
-//        getPhotoDialog.show();
-
-        //get the last 10 photos
         fileList = new ArrayList<String>();
 
         //hide the upload text view
@@ -104,9 +91,6 @@ public class UploadPicturesActivity extends AppCompatActivity {
         if(isPhoto) {
             mGridview = (GridView) findViewById(R.id.gridview);
             mGridview.setAdapter(new ImageAdapter(this));
-//            mGridview.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
-//            mGridview.setMultiChoiceModeListener(new MultiChoiceModeListener());
-
 
             mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v,
@@ -131,10 +115,8 @@ public class UploadPicturesActivity extends AppCompatActivity {
                     TextView tvUpload = (TextView) findViewById(R.id.tv_upload);
                     if(nSelected>0){
                         tvUpload.setVisibility(View.VISIBLE);
-//                        tvUpload.setEnabled(true);
                     }else{
                         tvUpload.setVisibility(View.GONE);
-//                        tvUpload.setEnabled(false);
                     }
 
                     //set largeView
@@ -156,7 +138,6 @@ public class UploadPicturesActivity extends AppCompatActivity {
 
 
     public void btnUploadClicked(View view){
-//        Toast.makeText(UploadPicturesActivity.this, "Upload clicked", Toast.LENGTH_SHORT).show();
         if (fileList.size()==0){
             Toast.makeText(this, "Select images or take a photo, please", Toast.LENGTH_SHORT).show();
             return;
@@ -176,7 +157,7 @@ public class UploadPicturesActivity extends AppCompatActivity {
 
             String filename = String.format("/upload%d.jpg", i);
             fullpath = strPropertyName + filename;
-            UploadFileToDropbox proc = new UploadFileToDropbox(UploadPicturesActivity.this, MainActivity.dropbox, fullpath,
+            UploadFileToDropbox proc = new UploadFileToDropbox(UploadPicturesActivity.this, fullpath,
                     tempFile, fileList.size());
             proc.execute();
         }
@@ -204,7 +185,7 @@ public class UploadPicturesActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         // Upload the photo
                         String fullpath = AddNewProperty.strPropertyName + "/" + photoName;
-                        UploadFileToDropbox upload = new UploadFileToDropbox(UploadPicturesActivity.this, MainActivity.dropbox,
+                        UploadFileToDropbox upload = new UploadFileToDropbox(UploadPicturesActivity.this,
                                 fullpath, myDiscCacheFile, -1);//-1 shows photo uploading
                         upload.execute();
                     }
@@ -244,48 +225,7 @@ public class UploadPicturesActivity extends AppCompatActivity {
         }
 
     }
-//    private class ImageAdapter extends BaseAdapter {
-//        private Context mContext;
-//
-//        public ImageAdapter(Context c) {
-//            mContext = c;
-//        }
-//
-//        public int getCount() { return mUrls.length;  }
-//
-//        public Object getItem(int position) {
-//            return mUrls[position];
-//        }
-//
-//        public long getItemId(int position) {
-//            return position;
-//        }
-//
-//        // create a new ImageView for each item referenced by the Adapter
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//            LayoutInflater inflater = (LayoutInflater) mContext
-//                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//
-//            View gridView;
-//
-//            if (convertView == null) {
-//                gridView = new View(mContext);
-//
-//                // get layout from mobile.xml
-//                gridView = inflater.inflate(R.layout.grid_item, null);
-//
-//                ImageView imageView = (ImageView) gridView
-//                        .findViewById(R.id.grid_item_image);
-//                imageView.setImageURI(mUrls[position]);
-//
-//                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//            } else {
-//                gridView = (View) convertView;
-//            }
-//            return gridView;
-//        }
-//
-//    }
+
     public class ImageAdapter extends BaseAdapter {
         private Context mContext;
 
@@ -316,8 +256,6 @@ public class UploadPicturesActivity extends AppCompatActivity {
             if (convertView == null) {
                 View gridView = new View(mContext);
                 gridView = inflater.inflate(R.layout.grid_item, null);
-               
-//                imageView.setImageURI(mUrls[position]);
 
                 l = new CheckableLayout(UploadPicturesActivity.this);
                 l.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.WRAP_CONTENT,
@@ -343,91 +281,9 @@ public class UploadPicturesActivity extends AppCompatActivity {
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
             return l;
-
-    //        CheckableLayout l;
-    //        ImageView i;
-    //
-    //        if (convertView == null) {
-    //            i = new ImageView(UploadPicturesActivity.this);
-    //            i.setScaleType(ImageView.ScaleType.FIT_CENTER);
-    //            i.setLayoutParams(new ViewGroup.LayoutParams(GridView.LayoutParams.MATCH_PARENT,
-    //                    GridView.LayoutParams.MATCH_PARENT));
-    //            l = new CheckableLayout(UploadPicturesActivity.this);
-    //            l.setLayoutParams(new GridView.LayoutParams(95,
-    //                    95));
-    //            l.addView(i);
-    //        } else {
-    //            l = (CheckableLayout) convertView;
-    //            i = (ImageView) l.getChildAt(0);
-    //        }
-    //
-    //        i.setImageResource(mThumbIds[position]);
-    //
-    //        return l;
-
         }
     }
 
-    public class MultiChoiceModeListener implements GridView.MultiChoiceModeListener{
-
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-            int selectCount = mGridview.getCheckedItemCount();
-            //show the delete text view
-            TextView tvUpload = (TextView) findViewById(R.id.tv_upload);
-            tvUpload.setVisibility(View.VISIBLE);
-            if (selectCount==0){
-                tvUpload.setVisibility(View.GONE);
-            }
-            switch (selectCount) {
-                case 1:
-                    mode.setSubtitle("One item selected");
-                    break;
-                default:
-                    mode.setSubtitle("" + selectCount + " items selected");
-                    break;
-            }
-            ImageView iv = (ImageView) findViewById(R.id.imageView_large);
-            //url to bitmap
-            File image = new File(mFiles[position]);
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
-            bitmap = Bitmap.createScaledBitmap(bitmap,iv.getWidth(),iv.getHeight(),true);
-            iv.setImageBitmap(bitmap);
-
-//            iv.setImageURI(mUrls[position]);
-
-
-            //  add to or remove from fileList
-            if (checked){
-                fileList.add(mFiles[position]);
-            }else{
-                fileList.remove(mFiles[position]);
-            }
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.setTitle("Select Items");
-            mode.setSubtitle("One item selected");
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-
-        }
-    }
     public class CheckableLayout extends FrameLayout implements Checkable {
         private boolean mChecked;
 
@@ -438,9 +294,6 @@ public class UploadPicturesActivity extends AppCompatActivity {
         public void setChecked(boolean checked) {
             mChecked = checked;
             setBackgroundColor(checked ? Color.YELLOW : Color.WHITE);
-//            setBackgroundDrawable(checked ?
-//                    getResources().getDrawable(R.drawable.photo_frame_small)
-//                    : null);
         }
 
         public boolean isChecked() {

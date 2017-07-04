@@ -24,11 +24,14 @@ package com.joshi.islandproperties;
 
         import com.dropbox.client2.DropboxAPI;
         import com.dropbox.client2.exception.DropboxException;
+        import com.dropbox.core.DbxException;
+        import com.dropbox.core.v2.files.DeleteErrorException;
+        import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
+        import com.joshi.islandproperties.interfaces.OnDeleteSuccess;
 
 
 public class DeleteFolder extends AsyncTask<Void, Void, Boolean> {
 
-    private DropboxAPI<?> dropbox;
     private String path;
     private Context context;
     private ListView mListView;
@@ -38,14 +41,13 @@ public class DeleteFolder extends AsyncTask<Void, Void, Boolean> {
     private final ProgressDialog mDialog;
 
     public AddNewProperty obj;
+    OnDeleteSuccess onDeleteSuccess;
 
-    public DeleteFolder(Context context, DropboxAPI<?> db,
-                        String path, ListView listView, View view, int position) {
+    public DeleteFolder(Context context,
+                        String path, int position, OnDeleteSuccess onDeleteSuccess) {
         this.context = context.getApplicationContext();
-        this.dropbox = db;
         this.path = path;
-        this.mListView = listView;
-        this.mView = view;
+        this.onDeleteSuccess = onDeleteSuccess;
         this.mPosition = position;
 
         mDialog = new ProgressDialog(context);
@@ -56,14 +58,12 @@ public class DeleteFolder extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-
-
         try {
-
-            dropbox.delete("/"+path);
+            DropboxClientFactory.getClient().files().delete(path);
             return true;
-
-        } catch (DropboxException e) {
+        } catch (DeleteErrorException e) {
+            e.printStackTrace();
+        } catch (DbxException e) {
             e.printStackTrace();
         }
 
@@ -75,41 +75,11 @@ public class DeleteFolder extends AsyncTask<Void, Void, Boolean> {
         if (result) {
             Toast.makeText(context, "Property deleted Sucesfully!",
                     Toast.LENGTH_LONG).show();
-
-            String item = SettingsActivity.deleteFolderPath;
-            SettingsActivity.list.remove(item);
-
-            StableArrayAdapter adapter = new StableArrayAdapter(context,
-                    R.layout.lst_setting_item, SettingsActivity.list);
-
-            SettingsActivity.mListView.setAdapter(adapter);
-            SettingsActivity.mListView.invalidate();
-
+            onDeleteSuccess.onDeleteSuccess();
         } else {
             Toast.makeText(context, "Failed to delete property", Toast.LENGTH_LONG)
                     .show();
         }
         mDialog.dismiss();
-    }
-    private class StableArrayAdapter extends ArrayAdapter<String> {
-
-        HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
-
-        public StableArrayAdapter(Context context, int textViewResourceId,
-                                  List<String> objects) {
-            super(context, textViewResourceId, objects);
-            for (int i = 0; i < objects.size(); ++i) {
-                mIdMap.put(objects.get(i), i);
-            }
-        }
-        @Override
-        public long getItemId(int position) {
-            String item = getItem(position);
-            return mIdMap.get(item);
-        }
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
     }
 }

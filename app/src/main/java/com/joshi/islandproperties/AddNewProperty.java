@@ -32,10 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
 
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 
@@ -56,8 +53,6 @@ public class AddNewProperty extends AppCompatActivity{
     private boolean isEmpty3 = false;
     private boolean isEmpty4 = false;
     private boolean isEmpty5 = false;
-
-    private DropboxAPI<AndroidAuthSession> dropbox;
 
     public static ProgressDialog mDialog;
     private AlertDialog.Builder alertDialog;
@@ -83,8 +78,6 @@ public class AddNewProperty extends AppCompatActivity{
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        dropbox = MainActivity.dropbox;
 
         Intent intent = getIntent();
         ipaOrAddress = intent.getIntExtra(MainActivity.EXTRA_MESSAGE, -1);
@@ -381,7 +374,7 @@ public class AddNewProperty extends AppCompatActivity{
 
     void createProperty(){
 
-        CreateFolder folder = new CreateFolder(AddNewProperty.this, dropbox,
+        CreateFolder folder = new CreateFolder(AddNewProperty.this,
                 strPropertyName);
         folder.obj = this;
         folder.execute();

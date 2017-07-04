@@ -4,4 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="title_sp">24sp</dimen>
+    <dimen name="global_padding">16dp</dimen>
+    <dimen name="thumbnail_size">36dp</dimen>
 </resources>

@@ -28,6 +28,10 @@ import com.dropbox.client2.exception.DropboxParseException;
 import com.dropbox.client2.exception.DropboxPartialFileException;
 import com.dropbox.client2.exception.DropboxServerException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.GetMetadataErrorException;
+import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
+import com.joshi.islandproperties.list_folders.ListFolderTask;
 
 
 /**

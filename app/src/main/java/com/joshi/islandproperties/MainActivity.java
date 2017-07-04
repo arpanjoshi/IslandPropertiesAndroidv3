@@ -1,44 +1,34 @@
 package com.joshi.islandproperties;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
-
-
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
-import android.view.MotionEvent;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
-
-import com.dropbox.client2.session.AccessTokenPair;
-import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session;
-
-import com.dropbox.client2.session.TokenPair;
+import com.dropbox.core.android.Auth;
+import com.dropbox.core.v2.users.FullAccount;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
-
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.Toast;
+import com.joshi.islandproperties.dropbox_classes.DropboxActivity;
+import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
+import com.joshi.islandproperties.dropbox_classes.GetCurrentAccountTask;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBack {
 
     public static DropboxAPI<AndroidAuthSession> dropbox;
-//    private final static String FILE_DIR = "/DropboxSample/";
     private final static String DROPBOX_NAME = "dropbox_prefs";
     private final static String ACCESS_KEY = "6hmmdoun2b3wd5s";
     private final static String ACCESS_SECRET = "i11xke09s4jdggm";
@@ -61,55 +51,32 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        loggedIn(false);
-        AndroidAuthSession session;
-        AppKeyPair pair = new AppKeyPair(ACCESS_KEY, ACCESS_SECRET);
-
-        SharedPreferences prefs = getSharedPreferences(DROPBOX_NAME, 0);
-        String key = prefs.getString(ACCESS_KEY, null);
-        String secret = prefs.getString(ACCESS_SECRET, null);
-
-        if (key != null && secret != null) {
-            AccessTokenPair token = new AccessTokenPair(key, secret);
-            session = new AndroidAuthSession(pair, ACCESS_TYPE, token);
-        } else {
-            session = new AndroidAuthSession(pair, ACCESS_TYPE);
-        }
-        dropbox = new DropboxAPI<AndroidAuthSession>(session);
-
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
-        ImageButton button = (ImageButton)findViewById(R.id.imageView_logout);
+        ImageButton button = (ImageButton) findViewById(R.id.imageView_logout);
         button.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    // change color
-//                    v.getBackground().setColorFilter(new LightingColorFilter(0xFFFFFFFF, 0xFFAA0000));
-//                   v.setBackgroundResource(R.drawable.logout_android_down);
                     v.getBackground().setColorFilter(0x88000088, PorterDuff.Mode.MULTIPLY);
 
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    // set to normal color
-//                    v.setBackgroundResource(R.drawable.logout_android);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     v.getBackground().clearColorFilter();
-                    if (isLoggedIn) {
+                    if (hasToken()) {
 
-                        dropbox.getSession().unlink();
-                        loggedIn(false);
+                        /*new LogoutFromDB(MainActivity.this, MainActivity.this).execute();*/
+                        // Revoking Token
+                        revokeToken();
                         v.setEnabled(false);
                         v.setVisibility(View.GONE);
-                        ImageButton ib = (ImageButton)findViewById(R.id.imageView_settings);
+                        ImageButton ib = (ImageButton) findViewById(R.id.imageView_settings);
                         ib.setVisibility(View.GONE);
-//                        Toast.makeText(MainActivity.this,
-//                                "Logged out successfully!",
-//                                Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                         startActivity(intent);
+                        finish();
 
                     }
                 }
@@ -117,12 +84,12 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        if(!isLoggedIn){
+        if (!hasToken()) {
             button.setEnabled(false);
             button.setVisibility(View.GONE);
         }
 
-        button = (ImageButton)findViewById(R.id.imageView_settings);
+        button = (ImageButton) findViewById(R.id.imageView_settings);
         button.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -131,14 +98,12 @@ public class MainActivity extends AppCompatActivity {
 
                     v.getBackground().setColorFilter(0x88000088, PorterDuff.Mode.MULTIPLY);
 
-                }
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
                     v.getBackground().clearColorFilter();
-                    if (!isLoggedIn) {
-                        dropbox.getSession().startAuthentication(MainActivity.this);
-                    }
-                    else {
+                    if (!hasToken()) {
+                        Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
+                    } else {
                         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                         startActivity(intent);
                     }
@@ -147,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        if(!isLoggedIn){
+        if (!hasToken()) {
             button.setEnabled(false);
             button.setVisibility(View.GONE);
         }
@@ -179,50 +144,38 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (hasToken()) {
+            ImageView iv = (ImageView) findViewById(R.id.imageView_logout);
+            iv.setEnabled(true);
+            iv.setVisibility(View.VISIBLE);
 
-        AndroidAuthSession session = dropbox.getSession();
-//        session.setAccessTokenPair(pair);
-        if (session.authenticationSuccessful()) {
-            try {
-                loggedIn(true);
+            iv = (ImageView) findViewById(R.id.imageView_settings);
+            iv.setEnabled(true);
+            iv.setVisibility(View.VISIBLE);
+        }
+    }
 
-
-                session.finishAuthentication();
-                TokenPair tokens = session.getAccessTokenPair();
-                SharedPreferences prefs = getSharedPreferences(DROPBOX_NAME, 0);
-                Editor editor = prefs.edit();
-                editor.putString(ACCESS_KEY, tokens.key);
-                editor.putString(ACCESS_SECRET, tokens.secret);
-                editor.commit();
-
-            } catch (IllegalStateException e) {
-                Toast.makeText(this, "Error during Dropbox authentication",
-                        Toast.LENGTH_SHORT).show();
+    @Override
+    protected void loadData() {
+        new GetCurrentAccountTask(DropboxClientFactory.getClient(), new GetCurrentAccountTask.Callback() {
+            @Override
+            public void onComplete(FullAccount result) {
+                Log.d("Logged In", "Success");
             }
-        }
-        if (isLoggedIn){
-            ImageView iv = (ImageView)findViewById(R.id.imageView_logout);
-            iv.setEnabled(true);
-            iv.setVisibility(View.VISIBLE);
 
-            iv = (ImageView)findViewById(R.id.imageView_settings);
-            iv.setEnabled(true);
-            iv.setVisibility(View.VISIBLE);
-        }
+            @Override
+            public void onError(Exception e) {
+                Log.e(getClass().getName(), "Failed to get account details.", e);
+            }
+        }).execute();
     }
 
-    public void loggedIn(boolean isLogged) {
-        isLoggedIn = isLogged;
-
-    }
-
-    public void btnIpaClicked(View view){
-        if (!isLoggedIn) {
-            dropbox.getSession().startAuthentication(MainActivity.this);
-
-//            dropbox.getSession().startOAuth2Authentication(MainActivity.this);
-        }
-        else {
+    public void btnIpaClicked(View view) {
+        if (!hasToken()) {
+            // Old Code of V1
+            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
+            Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
+        } else {
 
             ipaOrAddress = 1;
             Intent intent = new Intent(this, AddNewProperty.class);
@@ -232,10 +185,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void btnAddressClicked(View view) {
-        if (!isLoggedIn) {
-            dropbox.getSession().startAuthentication(MainActivity.this);
-        }
-        else {
+        if (!hasToken()) {
+            // Old DropBox Code of V1
+            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
+            Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
+        } else {
             ipaOrAddress = 0;
             Intent intent = new Intent(this, AddNewProperty.class);
             intent.putExtra(EXTRA_MESSAGE, ipaOrAddress);
@@ -245,12 +199,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void btnSearchClicked(View view) {
-        if (!isLoggedIn) {
-            dropbox.getSession().startAuthentication(MainActivity.this);
-        }
-        else {
-        Intent intent = new Intent(this, SearchActivity.class);
-        startActivity(intent);
+        if (!hasToken()) {
+            // Old DropBox Code of V1
+            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
+            Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
+        } else {
+            Intent intent = new Intent(this, SearchActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -300,5 +255,11 @@ public class MainActivity extends AppCompatActivity {
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
+    }
+
+    @Override
+    public void isUserLoggedOut(boolean status) {
+        /*if (status)
+            revokeToken();*/
     }
 }

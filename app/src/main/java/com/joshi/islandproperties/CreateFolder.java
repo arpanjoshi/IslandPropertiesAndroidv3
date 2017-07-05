@@ -13,23 +13,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.CreateFolderErrorException;
+import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
 
 
 public class CreateFolder extends AsyncTask<Void, Void, Boolean> {
 
-    private DropboxAPI<?> dropbox;
     private String path;
     private Context context;
     private final ProgressDialog mDialog;
     public AddNewProperty obj;
     String strError;
 
-    public CreateFolder(Context context, DropboxAPI<?> dropbox,
-                               String path) {
+    public CreateFolder(Context context,
+                        String path) {
         this.context = context.getApplicationContext();
-        this.dropbox = dropbox;
         this.path = path;
 
         mDialog = new ProgressDialog(context);
@@ -42,11 +41,13 @@ public class CreateFolder extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... params) {
 
         try {
-            dropbox.createFolder(path);
+            DropboxClientFactory.getClient().files().createFolder(path);
             return true;
-        }  catch (DropboxException e) {
+        } catch (CreateFolderErrorException e) {
             e.printStackTrace();
             strError = e.toString();
+        } catch (DbxException e) {
+            e.printStackTrace();
         }
 
         return false;

@@ -12,10 +12,10 @@
     tools:context="com.joshi.islandproperties.SearchActivity"
     tools:showIn="@layout/activity_search">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/list_search"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-    </ListView>
+        android:layout_height="fill_parent"
+        android:clipToPadding="false" />
 
 </RelativeLayout>

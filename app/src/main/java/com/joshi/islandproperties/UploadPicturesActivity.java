@@ -20,6 +20,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,7 +59,7 @@ public class UploadPicturesActivity extends AppCompatActivity {
     public static File tempFile;
     public static boolean isPhoto;
     public static ProgressDialog mDialog;
-    public static String strPropertyName;
+    public String strPropertyName;
 
     public static Uri[] mUrls;
     public static String[] mFiles;
@@ -81,6 +82,9 @@ public class UploadPicturesActivity extends AppCompatActivity {
         }
 
         fileList = new ArrayList<String>();
+
+        strPropertyName = getIntent().getStringExtra("strDir");
+        Log.d("strPropertyName", strPropertyName);
 
         //hide the upload text view
         TextView tvDelete = (TextView) findViewById(R.id.tv_upload);
@@ -154,9 +158,10 @@ public class UploadPicturesActivity extends AppCompatActivity {
         }
         for (int i=0; i<fileList.size(); i++){
             tempFile = new File(fileList.get(i));
-
-            String filename = String.format("/upload%d.jpg", i);
-            fullpath = strPropertyName + filename;
+            String str;
+            str = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            final String photoName = "img_" + str + ".jpg";
+            fullpath = strPropertyName + photoName;
             UploadFileToDropbox proc = new UploadFileToDropbox(UploadPicturesActivity.this, fullpath,
                     tempFile, fileList.size());
             proc.execute();
@@ -184,7 +189,7 @@ public class UploadPicturesActivity extends AppCompatActivity {
                 alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // Upload the photo
-                        String fullpath = AddNewProperty.strPropertyName + "/" + photoName;
+                        String fullpath = strPropertyName + "/" + photoName;
                         UploadFileToDropbox upload = new UploadFileToDropbox(UploadPicturesActivity.this,
                                 fullpath, myDiscCacheFile, -1);//-1 shows photo uploading
                         upload.execute();

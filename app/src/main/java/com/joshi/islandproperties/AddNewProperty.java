@@ -44,7 +44,7 @@ import java.util.Arrays;
 public class AddNewProperty extends AppCompatActivity{
 
     private int ipaOrAddress;
-    public static String strPropertyName;
+    public String strPropertyName;
     String strCheck, strCamera;
 
     private boolean isEmpty = false;
@@ -391,9 +391,7 @@ public class AddNewProperty extends AppCompatActivity{
         }else{
             UploadPicturesActivity.isPhoto = false;
         }
-        UploadPicturesActivity.strPropertyName = strPropertyName;
-        Intent intent = new Intent(this, UploadPicturesActivity.class);
-//        intent.putExtra(EXTRA_MESSAGE, ipaOrAddress);
+        Intent intent = new Intent(this, UploadPicturesActivity.class).putExtra("strDir", strPropertyName);
         startActivity(intent);
     }
 

@@ -30,22 +30,11 @@ import java.util.ArrayList;
 
 public class SettingsActivity extends DropboxActivity implements OnDeleteSuccess {
 
-    private DropboxAPI<AndroidAuthSession> dropbox;
-    //    private final static String FILE_DIR = "/DropboxSample/";
-//    private final static String DROPBOX_NAME = "dropbox_prefs";
-//    private final static String ACCESS_KEY = "2jczkyw2vzma3so";
-//    private final static String ACCESS_SECRET = "gio4u7uy57vpzx1";
-//    final static private Session.AccessType ACCESS_TYPE = Session.AccessType.DROPBOX;
-//    public static boolean isLoggedIn = false;
-//    public static boolean endDLFiles = false;
-//    public static boolean endDeleteFolder = false;
-
     private final String FILE_DIR = "/";
     public static String[] mfnames = null;
 
     public RecyclerView mListView;
     public static ArrayList<String> list;
-//    public static StableArrayAdapter adapter;
 
     public static String deleteFolderPath;
     private int mPosition;
@@ -64,8 +53,6 @@ public class SettingsActivity extends DropboxActivity implements OnDeleteSuccess
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        dropbox = MainActivity.dropbox;
 
         mListView = (RecyclerView) findViewById(R.id.list_settings);
         mListView.setItemAnimator(new DefaultItemAnimator());

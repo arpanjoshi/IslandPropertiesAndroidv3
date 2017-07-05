@@ -217,7 +217,7 @@ public class DownloadPicture extends AsyncTask<Void, Long, Boolean> {
             mView.setImageDrawable(mDrawableList.get(0));
 
             ImageAdapter_Detail adapter = new ImageAdapter_Detail(mContext);
-            DetailActivity.mGridview.setAdapter(adapter);
+            /*DetailActivity.mGridview.setAdapter(adapter);*/
 
 
         } else {

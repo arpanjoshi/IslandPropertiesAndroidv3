@@ -28,12 +28,6 @@ import com.joshi.islandproperties.dropbox_classes.GetCurrentAccountTask;
 
 public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBack {
 
-    public static DropboxAPI<AndroidAuthSession> dropbox;
-    private final static String DROPBOX_NAME = "dropbox_prefs";
-    private final static String ACCESS_KEY = "6hmmdoun2b3wd5s";
-    private final static String ACCESS_SECRET = "i11xke09s4jdggm";
-    final static private Session.AccessType ACCESS_TYPE = Session.AccessType.DROPBOX;
-    public static boolean isLoggedIn;
     private int ipaOrAddress;
 
     public final static String EXTRA_MESSAGE = "MESSAGE";

@@ -2,38 +2,24 @@ package com.joshi.islandproperties;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-
 import android.util.Log;
 import android.view.View;
-
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.joshi.islandproperties.dropbox_classes.DropboxActivity;
 import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
 import com.joshi.islandproperties.dropbox_classes.PicassoClient;
-import com.joshi.islandproperties.list_folders.FilesAdapter;
 import com.joshi.islandproperties.list_folders.ImageAdapter;
 import com.joshi.islandproperties.list_folders.ListFolderTask;
 
@@ -112,9 +98,6 @@ public class DetailActivity extends DropboxActivity {
     }
 
     boolean getTenPhotos(){
-
-//        File images = Environment.getExternalStorageDirectory();
-
         File images = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         if (images.exists()) {
             File test1 = new File(images, "100MEDIA/");

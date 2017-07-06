@@ -177,7 +177,6 @@ public class AddNewProperty extends AppCompatActivity{
                         strPropertyName = "/IPA-" + strIpa;
                         strCheck = "IPA Property # " + strIpa + " added successfully.";
                         strCamera = "Add Pics for IPA-" + strIpa;
-//                        Toast.makeText(getApplicationContext(), strPropertyName, Toast.LENGTH_SHORT).show();
                         try {
                             createProperty();
                         } catch (Exception e) {
@@ -206,7 +205,6 @@ public class AddNewProperty extends AppCompatActivity{
             dropdown = (Spinner)textEntryView.findViewById(R.id.spinner1);
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                     android.R.layout.simple_spinner_item, arrStates);
-//            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, arrStates);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             dropdown.setAdapter(adapter);
             dropdown.setOnItemSelectedListener(new CustomOnItemSelectedListener());
@@ -267,26 +265,6 @@ public class AddNewProperty extends AppCompatActivity{
                 city.setText(strCity);
             }
 
-//            final EditText state = (EditText) textEntryView.findViewById(R.id.state);
-//            state.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                    if (actionId == EditorInfo.IME_ACTION_GO || actionId == EditorInfo.IME_ACTION_DONE) {
-//                        // hide virtual keyboard
-//                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-//                        imm.hideSoftInputFromWindow(state.getWindowToken(), 0);
-//                        return true;
-//                    }
-//                    return false;
-//                }
-//            });
-//            if(isEmpty4){
-//                state.setError("Please select State");
-//            }else{
-//                state.setText(strState);
-//            }
-
-
-
             final EditText zipcode = (EditText) textEntryView.findViewById(R.id.zipcode);
             zipcode.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -345,7 +323,6 @@ public class AddNewProperty extends AppCompatActivity{
                         strPropertyName = "/" + strStNum + " " + strStName + " " + strCity + " " + strState + " " + strZipcode;
                         strCheck = "Address Property # " + strAddress + " added successfully.";
                         strCamera = "Add Pics for " + strAddress;
-//                        Toast.makeText(getApplicationContext(), strPropertyName, Toast.LENGTH_SHORT).show();
                         try {
                             createProperty();
                         } catch (Exception e) {
@@ -362,9 +339,6 @@ public class AddNewProperty extends AppCompatActivity{
                     // Write your code here to invoke NO event
                     dialog.cancel();
                     finish();
-//                    Intent intent = new Intent(this, MainActivity.class);
-//                    intent.putExtra(EXTRA_MESSAGE, ipaOrAddress);
-//                    startActivity(intent);
 
                 }
             });
@@ -397,8 +371,6 @@ public class AddNewProperty extends AppCompatActivity{
 
 
     boolean getTenPhotos(){
-
-//        File images = Environment.getExternalStorageDirectory();
 
         File images = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         if (images.exists()) {

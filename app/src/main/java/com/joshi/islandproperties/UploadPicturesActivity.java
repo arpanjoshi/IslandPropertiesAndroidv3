@@ -2,60 +2,43 @@ package com.joshi.islandproperties;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-
 import android.graphics.Bitmap;
-
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Checkable;
 import android.widget.FrameLayout;
-
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.io.comparator.LastModifiedFileComparator;
-
 import java.io.File;
-
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
 public class UploadPicturesActivity extends AppCompatActivity {
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-//    private Uri fileUri;
-    public  static File myDiscCacheFile;
+
+    public static File myDiscCacheFile;
     public static File tempFile;
     public static boolean isPhoto;
     public static ProgressDialog mDialog;
@@ -84,7 +67,6 @@ public class UploadPicturesActivity extends AppCompatActivity {
         fileList = new ArrayList<String>();
 
         strPropertyName = getIntent().getStringExtra("strDir");
-        Log.d("strPropertyName", strPropertyName);
 
         //hide the upload text view
         TextView tvDelete = (TextView) findViewById(R.id.tv_upload);
@@ -92,7 +74,7 @@ public class UploadPicturesActivity extends AppCompatActivity {
 
         selectedElements = new boolean[10];
         nSelected = 0;
-        if(isPhoto) {
+        if (isPhoto) {
             mGridview = (GridView) findViewById(R.id.gridview);
             mGridview.setAdapter(new ImageAdapter(this));
 
@@ -117,9 +99,9 @@ public class UploadPicturesActivity extends AppCompatActivity {
 
                     //set upload button visiblity
                     TextView tvUpload = (TextView) findViewById(R.id.tv_upload);
-                    if(nSelected>0){
+                    if (nSelected > 0) {
                         tvUpload.setVisibility(View.VISIBLE);
-                    }else{
+                    } else {
                         tvUpload.setVisibility(View.GONE);
                     }
 
@@ -128,21 +110,21 @@ public class UploadPicturesActivity extends AppCompatActivity {
                     //url to bitmap
                     File image = new File(mFiles[position]);
                     BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                    Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
-                    bitmap = Bitmap.createScaledBitmap(bitmap,iv.getWidth(),iv.getHeight(),true);
+                    Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+                    bitmap = Bitmap.createScaledBitmap(bitmap, iv.getWidth(), iv.getHeight(), true);
                     iv.setImageBitmap(bitmap);
 
 
                 }
             });
         }
-        if(AddNewProperty.mDialog != null) AddNewProperty.mDialog.dismiss();
-        if(DetailActivity.mDialog != null) DetailActivity.mDialog.dismiss();
+        if (AddNewProperty.mDialog != null) AddNewProperty.mDialog.dismiss();
+        if (DetailActivity.mDialog != null) DetailActivity.mDialog.dismiss();
     }
 
 
-    public void btnUploadClicked(View view){
-        if (fileList.size()==0){
+    public void btnUploadClicked(View view) {
+        if (fileList.size() == 0) {
             Toast.makeText(this, "Select images or take a photo, please", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -152,11 +134,11 @@ public class UploadPicturesActivity extends AppCompatActivity {
         mDialog.show();
 
         String fullpath;
-        if(nSelected != fileList.size()){
+        if (nSelected != fileList.size()) {
             Toast.makeText(this, "Number of selects Error!", Toast.LENGTH_LONG).show();
             return;
         }
-        for (int i=0; i<fileList.size(); i++){
+        for (int i = 0; i < fileList.size(); i++) {
             tempFile = new File(fileList.get(i));
             String str;
             str = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
@@ -167,12 +149,14 @@ public class UploadPicturesActivity extends AppCompatActivity {
             proc.execute();
         }
     }
-    public void btnTakePhotoClicked(View view){
+
+    public void btnTakePhotoClicked(View view) {
 
         //create new Intent
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -212,7 +196,8 @@ public class UploadPicturesActivity extends AppCompatActivity {
             }
         }
     }
-    private void saveFileInCache(String aFileName, Intent data){
+
+    private void saveFileInCache(String aFileName, Intent data) {
         Bitmap myImage = (Bitmap) data.getExtras().get("data");
         final String cachePath = this.getCacheDir().getPath();
         File myDiscCacheFilePath;
@@ -220,11 +205,11 @@ public class UploadPicturesActivity extends AppCompatActivity {
         myDiscCacheFilePath = new File(cachePath);
         myDiscCacheFile = new File(myDiscCacheFilePath + File.separator + aFileName);
 
-        try{
+        try {
             FileOutputStream out = new FileOutputStream(myDiscCacheFile);
             myImage.compress(Bitmap.CompressFormat.JPEG, 80, out);
             out.close();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "Problem saving file in cache", Toast.LENGTH_SHORT).show();
         }
@@ -280,8 +265,8 @@ public class UploadPicturesActivity extends AppCompatActivity {
             //url to bitmap
             File image = new File(mFiles[position]);
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(),bmOptions);
-            bitmap = Bitmap.createScaledBitmap(bitmap,85,85,true);
+            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+            bitmap = Bitmap.createScaledBitmap(bitmap, 85, 85, true);
             imageView.setImageBitmap(bitmap);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
@@ -295,6 +280,7 @@ public class UploadPicturesActivity extends AppCompatActivity {
         public CheckableLayout(Context context) {
             super(context);
         }
+
 
         public void setChecked(boolean checked) {
             mChecked = checked;

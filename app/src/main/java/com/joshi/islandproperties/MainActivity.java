@@ -12,10 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.session.Session;
 import com.dropbox.core.android.Auth;
 import com.dropbox.core.v2.users.FullAccount;
 import com.google.android.gms.appindexing.Action;
@@ -28,12 +24,6 @@ import com.joshi.islandproperties.dropbox_classes.GetCurrentAccountTask;
 
 public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBack {
 
-    public static DropboxAPI<AndroidAuthSession> dropbox;
-    private final static String DROPBOX_NAME = "dropbox_prefs";
-    private final static String ACCESS_KEY = "6hmmdoun2b3wd5s";
-    private final static String ACCESS_SECRET = "i11xke09s4jdggm";
-    final static private Session.AccessType ACCESS_TYPE = Session.AccessType.DROPBOX;
-    public static boolean isLoggedIn;
     private int ipaOrAddress;
 
     public final static String EXTRA_MESSAGE = "MESSAGE";
@@ -172,8 +162,6 @@ public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBa
 
     public void btnIpaClicked(View view) {
         if (!hasToken()) {
-            // Old Code of V1
-            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
             Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
         } else {
 
@@ -186,8 +174,6 @@ public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBa
 
     public void btnAddressClicked(View view) {
         if (!hasToken()) {
-            // Old DropBox Code of V1
-            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
             Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
         } else {
             ipaOrAddress = 0;
@@ -200,8 +186,6 @@ public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBa
 
     public void btnSearchClicked(View view) {
         if (!hasToken()) {
-            // Old DropBox Code of V1
-            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
             Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
         } else {
             Intent intent = new Intent(this, SearchActivity.class);
@@ -259,7 +243,6 @@ public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBa
 
     @Override
     public void isUserLoggedOut(boolean status) {
-        /*if (status)
-            revokeToken();*/
+
     }
 }

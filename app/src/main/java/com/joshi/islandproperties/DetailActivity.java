@@ -98,9 +98,6 @@ public class DetailActivity extends DropboxActivity {
     }
 
     boolean getTenPhotos(){
-
-//        File images = Environment.getExternalStorageDirectory();
-
         File images = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         if (images.exists()) {
             File test1 = new File(images, "100MEDIA/");

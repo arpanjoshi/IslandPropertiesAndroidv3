@@ -25,12 +25,8 @@ public class LoginActivity extends DropboxActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
                     v.setBackgroundColor(Color.BLUE);
-
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-
-//                    v.getBackground().setColorFilter(0xff33b5e5, PorterDuff.Mode.MULTIPLY);
                     v.setBackgroundColor(0xff33b5e5);
                     Auth.startOAuth2Authentication(LoginActivity.this, getString(R.string.app_key));
                 }

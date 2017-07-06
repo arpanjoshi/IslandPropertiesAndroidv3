@@ -28,8 +28,6 @@ import java.util.ArrayList;
 public class SettingsActivity extends DropboxActivity implements OnDeleteSuccess {
 
     private final String FILE_DIR = "/";
-    public static String[] mfnames = null;
-
     public RecyclerView mListView;
     public static ArrayList<String> list;
 

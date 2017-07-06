@@ -162,8 +162,6 @@ public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBa
 
     public void btnIpaClicked(View view) {
         if (!hasToken()) {
-            // Old Code of V1
-            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
             Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
         } else {
 
@@ -176,8 +174,6 @@ public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBa
 
     public void btnAddressClicked(View view) {
         if (!hasToken()) {
-            // Old DropBox Code of V1
-            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
             Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
         } else {
             ipaOrAddress = 0;
@@ -190,8 +186,6 @@ public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBa
 
     public void btnSearchClicked(View view) {
         if (!hasToken()) {
-            // Old DropBox Code of V1
-            /*dropbox.getSession().startAuthentication(MainActivity.this);*/
             Auth.startOAuth2Authentication(MainActivity.this, getString(R.string.app_key));
         } else {
             Intent intent = new Intent(this, SearchActivity.class);
@@ -249,7 +243,6 @@ public class MainActivity extends DropboxActivity implements LogoutFromDB.CallBa
 
     @Override
     public void isUserLoggedOut(boolean status) {
-        /*if (status)
-            revokeToken();*/
+
     }
 }

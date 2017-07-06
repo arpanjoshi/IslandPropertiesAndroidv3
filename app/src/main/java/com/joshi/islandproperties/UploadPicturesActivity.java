@@ -67,7 +67,6 @@ public class UploadPicturesActivity extends AppCompatActivity {
         fileList = new ArrayList<String>();
 
         strPropertyName = getIntent().getStringExtra("strDir");
-        Log.d("strPropertyName", strPropertyName);
 
         //hide the upload text view
         TextView tvDelete = (TextView) findViewById(R.id.tv_upload);

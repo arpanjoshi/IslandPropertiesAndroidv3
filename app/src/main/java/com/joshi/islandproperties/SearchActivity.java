@@ -30,14 +30,9 @@ import java.util.ArrayList;
 public class SearchActivity extends DropboxActivity {
 
     private final String FILE_DIR = "/";
-    public static String[] mfnames = null;
 
     public RecyclerView mListView;
-    public static ArrayList<String> list;
-//    public static StableArrayAdapter adapter;
 
-//    public static String deleteFolderPath;
-//    private  int mPosition;
     public static boolean fromDetail = false;
 
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
@@ -77,17 +72,6 @@ public class SearchActivity extends DropboxActivity {
         mListView.setHasFixedSize(true);
         //Layout manager for Recycler view
         mListView.setLayoutManager(new LinearLayoutManager(this));
-        list = new ArrayList<String>();
-
-        /*mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                Intent intent = new Intent(SearchActivity.this, DetailActivity.class);
-                intent.putExtra(EXTRA_MESSAGE, mfnames[position]);
-                startActivity(intent);
-            }
-        });*/
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item){

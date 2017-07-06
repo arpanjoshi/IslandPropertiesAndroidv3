@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/IslandPropertiesAndroid.iml" filepath="$PROJECT_DIR$/IslandPropertiesAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Islandproperties_160213.iml" filepath="$PROJECT_DIR$/Islandproperties_160213.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/commons.io_2.0.1/commons.io_2.0.1.iml" filepath="$PROJECT_DIR$/commons.io_2.0.1/commons.io_2.0.1.iml" />
       <module fileurl="file://$PROJECT_DIR$/dropbox-android-sdk-1.6.3/dropbox-android-sdk-1.6.3.iml" filepath="$PROJECT_DIR$/dropbox-android-sdk-1.6.3/dropbox-android-sdk-1.6.3.iml" />

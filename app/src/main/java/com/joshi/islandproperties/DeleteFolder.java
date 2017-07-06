@@ -8,26 +8,17 @@ package com.joshi.islandproperties;
  * Created by David on 1/5/2016.
  */
 
-        import java.util.HashMap;
-        import java.util.List;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.Toast;
 
-        import android.app.ProgressDialog;
-        import android.content.Context;
-
-        import android.os.AsyncTask;
-        import android.view.View;
-        import android.widget.ArrayAdapter;
-
-        import android.widget.ListView;
-
-        import android.widget.Toast;
-
-        import com.dropbox.client2.DropboxAPI;
-        import com.dropbox.client2.exception.DropboxException;
-        import com.dropbox.core.DbxException;
-        import com.dropbox.core.v2.files.DeleteErrorException;
-        import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
-        import com.joshi.islandproperties.interfaces.OnDeleteSuccess;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.DeleteErrorException;
+import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
+import com.joshi.islandproperties.interfaces.OnDeleteSuccess;
 
 
 public class DeleteFolder extends AsyncTask<Void, Void, Boolean> {

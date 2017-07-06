@@ -13,8 +13,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.UploadErrorException;
 import com.dropbox.core.v2.files.WriteMode;

@@ -12,10 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.session.Session;
 import com.dropbox.core.android.Auth;
 import com.dropbox.core.v2.users.FullAccount;
 import com.google.android.gms.appindexing.Action;

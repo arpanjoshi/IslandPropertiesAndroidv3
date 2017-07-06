@@ -13,21 +13,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Checkable;
@@ -37,24 +30,17 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.apache.commons.io.comparator.LastModifiedFileComparator;
-
 import java.io.File;
-
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
 public class UploadPicturesActivity extends AppCompatActivity {
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-//    private Uri fileUri;
+
     public  static File myDiscCacheFile;
     public static File tempFile;
     public static boolean isPhoto;

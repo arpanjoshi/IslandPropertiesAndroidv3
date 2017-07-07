@@ -2,25 +2,26 @@ package com.joshi.islandproperties;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-
+import android.util.Log;
 import android.view.View;
-
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ImageView;
-
-
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
+import android.widget.Toast;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.joshi.islandproperties.dropbox_classes.DropboxActivity;
+import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
+import com.joshi.islandproperties.dropbox_classes.PicassoClient;
+import com.joshi.islandproperties.list_folders.ImageAdapter;
+import com.joshi.islandproperties.list_folders.ListFolderTask;
 
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 
@@ -29,13 +30,17 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends DropboxActivity {
 
-    private DropboxAPI<AndroidAuthSession> dropbox;
     public String folderName;
-    public static GridView mGridview;
+    public RecyclerView mGridview;
     public static ProgressDialog mDialog;
     private String strDir;
+
+    ImageAdapter mFilesAdapter;
+    FileMetadata mSelectedFile;
+
+    public static ImageView largeImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,36 +54,31 @@ public class DetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        com.joshi.islandproperties.SearchActivity.fromDetail = true;
-        Intent intent = getIntent();
-        folderName = intent.getStringExtra(com.joshi.islandproperties.SearchActivity.EXTRA_MESSAGE);
-//        Toast.makeText(getApplicationContext(),
-//                        folderName, Toast.LENGTH_LONG)
-//                        .show();
-        dropbox = MainActivity.dropbox;
+        mFilesAdapter = new ImageAdapter(PicassoClient.getPicasso(), new ImageAdapter.Callback() {
+            @Override
+            public void onFolderClicked(FolderMetadata folder) {
 
-        strDir = "/" + folderName;
-        ImageView iv = (ImageView)findViewById(R.id.imageView_large_detail);
-//        iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            }
 
-        mGridview = (GridView) findViewById(R.id.gridview_detail);
-
-
-        mGridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-
-                ImageView i = (ImageView)findViewById(R.id.imageView_large_detail);
-                i.setImageDrawable(DownloadPicture.mDrawableList.get(position));
-//                iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            @Override
+            public void onFileClicked(FileMetadata file) {
 
             }
         });
 
-        //download pictures
-        DownloadPicture download = new DownloadPicture(
-                DetailActivity.this, dropbox, strDir, iv);
-        download.execute();
+        com.joshi.islandproperties.SearchActivity.fromDetail = true;
+        Intent intent = getIntent();
+        folderName = intent.getStringExtra(com.joshi.islandproperties.SearchActivity.EXTRA_MESSAGE);
+
+        strDir = "/"+folderName;
+        largeImage = (ImageView)findViewById(R.id.imageView_large_detail);
+
+        mGridview = (RecyclerView) findViewById(R.id.gridview_detail);
+        mGridview.setItemAnimator(new DefaultItemAnimator());
+        mGridview.setHasFixedSize(true);
+        //Layout manager for Recycler view
+        mGridview.setLayoutManager(new GridLayoutManager(this, 3));
+
     }
 
     public void btnAddClicked(View view){
@@ -92,15 +92,12 @@ public class DetailActivity extends AppCompatActivity {
         }else{
             UploadPicturesActivity.isPhoto = false;
         }
-        UploadPicturesActivity.strPropertyName = strDir;
-        Intent intent = new Intent(this, UploadPicturesActivity.class);
+        Log.d("strDir", strDir);
+        Intent intent = new Intent(this, UploadPicturesActivity.class).putExtra("strDir", strDir);
         startActivity(intent);
     }
 
     boolean getTenPhotos(){
-
-//        File images = Environment.getExternalStorageDirectory();
-
         File images = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         if (images.exists()) {
             File test1 = new File(images, "100MEDIA/");
@@ -149,5 +146,32 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    @Override
+    protected void loadData() {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(false);
+        dialog.setMessage("Loading...");
+        dialog.show();
+
+        new ListFolderTask(DropboxClientFactory.getClient(), new ListFolderTask.Callback() {
+            @Override
+            public void onDataLoaded(ListFolderResult result) {
+                dialog.dismiss();
+                mFilesAdapter.setFiles(result.getEntries());
+                mGridview.setAdapter(mFilesAdapter);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                dialog.dismiss();
+                Toast.makeText(DetailActivity.this,
+                        "An error has occurred",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }).execute(strDir);
     }
 }

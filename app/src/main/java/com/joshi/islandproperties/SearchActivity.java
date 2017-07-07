@@ -1,42 +1,45 @@
 package com.joshi.islandproperties;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-
-import android.widget.ListView;
-
-
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
+import android.widget.Toast;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.joshi.islandproperties.dropbox_classes.DropboxActivity;
+import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
+import com.joshi.islandproperties.dropbox_classes.PicassoClient;
+import com.joshi.islandproperties.list_folders.FilesAdapter;
+import com.joshi.islandproperties.list_folders.ListFolderTask;
 
 import java.util.ArrayList;
 
 
-public class SearchActivity extends AppCompatActivity {
-
-    private DropboxAPI<AndroidAuthSession> dropbox;
+public class SearchActivity extends DropboxActivity {
 
     private final String FILE_DIR = "/";
-    public static String[] mfnames = null;
 
-    public static ListView mListView;
-    public static ArrayList<String> list;
-//    public static StableArrayAdapter adapter;
+    public RecyclerView mListView;
 
-//    public static String deleteFolderPath;
-//    private  int mPosition;
     public static boolean fromDetail = false;
 
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
+
+
+    FilesAdapter mFilesAdapter;
+    FileMetadata mSelectedFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,28 +53,25 @@ public class SearchActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        dropbox = MainActivity.dropbox;
-
-        mListView = (ListView) findViewById(R.id.list_search);
-        list = new ArrayList<String>();
-
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mFilesAdapter = new FilesAdapter(PicassoClient.getPicasso(), new FilesAdapter.Callback() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            public void onFolderClicked(FolderMetadata folder) {
                 Intent intent = new Intent(SearchActivity.this, DetailActivity.class);
-                intent.putExtra(EXTRA_MESSAGE, mfnames[position]);
+                intent.putExtra(EXTRA_MESSAGE, folder.getName());
                 startActivity(intent);
-//                Toast.makeText(getApplicationContext(),
-//                        mfnames[position], Toast.LENGTH_LONG)
-//                        .show();
-                //show the delete text view
-//                TextView tvDelete = (TextView) findViewById(R.id.tv_delete);
-//                tvDelete.setVisibility(View.VISIBLE);
-//                mPosition = position;
-//                deleteFolderPath = mfnames[position];
+            }
+
+            @Override
+            public void onFileClicked(FileMetadata file) {
+                Log.d("file meta data", file.toString());
             }
         });
+
+        mListView = (RecyclerView) findViewById(R.id.list_search);
+        mListView.setItemAnimator(new DefaultItemAnimator());
+        mListView.setHasFixedSize(true);
+        //Layout manager for Recycler view
+        mListView.setLayoutManager(new LinearLayoutManager(this));
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -82,35 +82,36 @@ public class SearchActivity extends AppCompatActivity {
         }
         return true;
     }
-//    public class StableArrayAdapter extends ArrayAdapter<String> {
-//
-//        HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
-//
-//        public StableArrayAdapter(Context context, int textViewResourceId,
-//                                  List<String> objects) {
-//            super(context, textViewResourceId, objects);
-//            for (int i = 0; i < objects.size(); ++i) {
-//                mIdMap.put(objects.get(i), i);
-//            }
-//        }
-//        @Override
-//        public long getItemId(int position) {
-//            String item = getItem(position);
-//            return mIdMap.get(item);
-//        }
-//        @Override
-//        public boolean hasStableIds() {
-//            return true;
-//        }
-//    }
+
     protected void onResume() {
         super.onResume();
 
-//        if (!fromDetail){
-        list.clear();
-            DLFiles dlf = new DLFiles(SearchActivity.this, dropbox,
-                    FILE_DIR, mfnames, mListView, "SearchActivity");
-            dlf.execute();
-//        }
+    }
+
+    @Override
+    protected void loadData() {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(false);
+        dialog.setMessage("Loading...");
+        dialog.show();
+
+        new ListFolderTask(DropboxClientFactory.getClient(), new ListFolderTask.Callback() {
+            @Override
+            public void onDataLoaded(ListFolderResult result) {
+                dialog.dismiss();
+                mFilesAdapter.setFiles(result.getEntries());
+                mListView.setAdapter(mFilesAdapter);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                dialog.dismiss();
+                Toast.makeText(SearchActivity.this,
+                        "An error has occurred",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }).execute("");
     }
 }

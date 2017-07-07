@@ -6,18 +6,20 @@ package com.joshi.islandproperties;
 import java.io.File;
 import java.io.FileInputStream;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.UploadErrorException;
+import com.dropbox.core.v2.files.WriteMode;
+import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
 
 public class UploadFileToDropbox extends AsyncTask<Void, Void, Boolean> {
 
-    private DropboxAPI<?> dropbox;
     private String path;
     private Context context;
     private File file;
@@ -25,11 +27,10 @@ public class UploadFileToDropbox extends AsyncTask<Void, Void, Boolean> {
     private ProgressDialog mDialog = null;
     public static int nUploads;
 
-    public UploadFileToDropbox(Context context, DropboxAPI<?> dropbox,
+    public UploadFileToDropbox(Context context,
                                String path, File ff, int cnt) {
 
         this.context = context.getApplicationContext();
-        this.dropbox = dropbox;
         this.path = path;
         this.file = ff;
         this.count = cnt;
@@ -48,11 +49,17 @@ public class UploadFileToDropbox extends AsyncTask<Void, Void, Boolean> {
 
         try {
             FileInputStream fileInputStream = new FileInputStream(this.file);
-            long len = this.file.length();
-            dropbox.putFile(path, fileInputStream,
-                    len, null, null);
+            DropboxClientFactory.getClient().files().uploadBuilder(path)
+                    .withMode(WriteMode.OVERWRITE)
+                    .uploadAndFinish(fileInputStream);
             return true;
-        } catch (IOException | DropboxException e) {
+        } catch (UploadErrorException e) {
+            e.printStackTrace();
+        } catch (DbxException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

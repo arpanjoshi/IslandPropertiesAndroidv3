@@ -1,47 +1,42 @@
 package com.joshi.islandproperties;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
-
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-
-import android.widget.ListView;
 import android.widget.TextView;
-
-
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
+import android.widget.Toast;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.joshi.islandproperties.dropbox_classes.DropboxActivity;
+import com.joshi.islandproperties.dropbox_classes.DropboxClientFactory;
+import com.joshi.islandproperties.dropbox_classes.PicassoClient;
+import com.joshi.islandproperties.interfaces.OnDeleteSuccess;
+import com.joshi.islandproperties.list_folders.FilesAdapter;
+import com.joshi.islandproperties.list_folders.ListFolderTask;
 
 import java.util.ArrayList;
 
 
-public class SettingsActivity extends AppCompatActivity {
-
-    private DropboxAPI<AndroidAuthSession> dropbox;
-    //    private final static String FILE_DIR = "/DropboxSample/";
-//    private final static String DROPBOX_NAME = "dropbox_prefs";
-//    private final static String ACCESS_KEY = "2jczkyw2vzma3so";
-//    private final static String ACCESS_SECRET = "gio4u7uy57vpzx1";
-//    final static private Session.AccessType ACCESS_TYPE = Session.AccessType.DROPBOX;
-//    public static boolean isLoggedIn = false;
-//    public static boolean endDLFiles = false;
-//    public static boolean endDeleteFolder = false;
+public class SettingsActivity extends DropboxActivity implements OnDeleteSuccess {
 
     private final String FILE_DIR = "/";
-    public static String[] mfnames = null;
-
-    public static ListView mListView;
+    public RecyclerView mListView;
     public static ArrayList<String> list;
-//    public static StableArrayAdapter adapter;
 
     public static String deleteFolderPath;
-    private  int mPosition;
+    private int mPosition;
+
+    FilesAdapter mFilesAdapter;
+    FileMetadata mSelectedFile;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,24 +49,24 @@ public class SettingsActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        dropbox = MainActivity.dropbox;
-
-        mListView = (ListView) findViewById(R.id.list);
+        mListView = (RecyclerView) findViewById(R.id.list_settings);
+        mListView.setItemAnimator(new DefaultItemAnimator());
+        mListView.setHasFixedSize(true);
+        //Layout manager for Recycler view
+        mListView.setLayoutManager(new LinearLayoutManager(this));
         list = new ArrayList<String>();
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mFilesAdapter = new FilesAdapter(PicassoClient.getPicasso(), new FilesAdapter.Callback() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-//                Toast.makeText(getApplicationContext(),
-//                        mfnames[position], Toast.LENGTH_LONG)
-//                        .show();
-                //show the delete text view
+            public void onFolderClicked(FolderMetadata folder) {
+                deleteFolderPath = folder.getPathLower();
                 TextView tvDelete = (TextView) findViewById(R.id.tv_delete);
                 tvDelete.setVisibility(View.VISIBLE);
-                mPosition = position;
-                deleteFolderPath = list.get(position);
-//                DeleteProperty(folderPath);
+            }
+
+            @Override
+            public void onFileClicked(FileMetadata file) {
+
             }
         });
 
@@ -79,31 +74,10 @@ public class SettingsActivity extends AppCompatActivity {
         TextView tvDelete = (TextView) findViewById(R.id.tv_delete);
         tvDelete.setVisibility(View.INVISIBLE);
     }
-//    public class StableArrayAdapter extends ArrayAdapter<String> {
-//
-//        HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
-//
-//        public StableArrayAdapter(Context context, int textViewResourceId,
-//                                  List<String> objects) {
-//            super(context, textViewResourceId, objects);
-//            for (int i = 0; i < objects.size(); ++i) {
-//                mIdMap.put(objects.get(i), i);
-//            }
-//        }
-//        @Override
-//        public long getItemId(int position) {
-//            String item = getItem(position);
-//            return mIdMap.get(item);
-//        }
-//        @Override
-//        public boolean hasStableIds() {
-//            return true;
-//        }
-//    }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
 
@@ -113,30 +87,54 @@ public class SettingsActivity extends AppCompatActivity {
 
     protected void onResume() {
         super.onResume();
-
-        DLFiles dlf = new DLFiles(SettingsActivity.this, dropbox,
-                FILE_DIR, mfnames, mListView, "SettingsActivity" );
-        dlf.execute();
     }
-      /**
+
+    @Override
+    protected void loadData() {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(false);
+        dialog.setMessage("Loading...");
+        dialog.show();
+
+        new ListFolderTask(DropboxClientFactory.getClient(), new ListFolderTask.Callback() {
+            @Override
+            public void onDataLoaded(ListFolderResult result) {
+                dialog.dismiss();
+                mFilesAdapter.setFiles(result.getEntries());
+                mListView.setAdapter(mFilesAdapter);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                dialog.dismiss();
+                Toast.makeText(SettingsActivity.this,
+                        "An error has occurred",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }).execute("");
+    }
+
+    /**
      * Shows keeping the access keys returned from Trusted Authenticator in a local
      * store, rather than storing user name & password, and re-authenticating each
      * time (which is not to be done, ever).
      */
 
-    public void btnDeleteClicked(View view){
+    public void btnDeleteClicked(View view) {
         view.setVisibility(View.INVISIBLE);
-//        Toast.makeText(getApplicationContext(),
-//                "btn clicked", Toast.LENGTH_LONG)
-//                .show();
-        DeleteProperty(deleteFolderPath, view);
+        DeleteProperty(deleteFolderPath);
     }
 
-    void DeleteProperty(String folderPath, View view){
-
-        DeleteFolder folder = new DeleteFolder(this, dropbox,
-                folderPath, mListView, view, mPosition);
-
+    void DeleteProperty(String folderPath) {
+        DeleteFolder folder = new DeleteFolder(this,
+                folderPath, mPosition, this);
         folder.execute();
+    }
+
+    @Override
+    public void onDeleteSuccess() {
+        loadData();
     }
 }
